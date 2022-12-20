@@ -16,7 +16,7 @@ function Layer:moveUp(dt)
 end
 
 function Layer:moveDown(dt)
-    self.y = math.min(VIRTUAL_HEIGHT - self.height, self.y + self.speed *dt)
+    self.y = math.min(VIRTUAL_HEIGHT, self.y + self.speed *dt)
 end
 
 function Layer:moveLeft(dt)
@@ -24,7 +24,7 @@ function Layer:moveLeft(dt)
 end
 
 function Layer:moveRight(dt)
-    self.x = math.min(VIRTUAL_WIDTH - self.width, self.x + self.speed * dt)
+    self.x = math.min(VIRTUAL_WIDTH, self.x + self.speed * dt)
 end
 
 function Layer:render()
