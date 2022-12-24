@@ -38,5 +38,9 @@ function Layer:render()
     vertices[3],vertices[4] = self.x-self.width,self.y-self.height -- top left
     vertices[5],vertices[6] = self.x+self.width,self.y-self.height -- top right
     vertices[7],vertices[8] = self.x+self.width+self.height,self.y -- bottom right
+    love.graphics.setColor(0,1,0)
     love.graphics.polygon('fill', vertices)
+    --[[love.graphics.setColor(1,1,0)
+    love.graphics.circle('fill',vertices[1]+10,vertices[2]-5,15)
+    love.graphics.circle('fill',vertices[7]-10,vertices[8]-5,15)--]]
 end
