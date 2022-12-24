@@ -61,8 +61,6 @@ function love.load()
     SPEED = 800 -- speed the branches move
     DISCHEIGHT = 50 -- height of the branches
     SPACING = 0 -- spacing between branches
-    STARRADIUS = 10
-    STARPOINTS = 5
 
     layers = {}
 
@@ -291,17 +289,6 @@ function love.draw()
         love.graphics.printf(score, 0, 20, VIRTUAL_WIDTH, "center")
     elseif GAME_STATE == "end" then
         love.graphics.printf('You did it! Score: ' .. score, 0, 20, VIRTUAL_WIDTH, 'center')
-        --[[starVertices = {}
-        for i=0,STARPOINTS,1 do
-            pointAngle = ((math.pi * 2) / STARPOINTS) * i
-            starVertices[i*2+1],starVertices[i*2+2] = 1000+(STARRADIUS * math.sin(pointAngle)),TREETOP + (STARRADIUS * math.cos(pointAngle)) -- point
-        end
-        love.graphics.setColor(1,1,0)
-        for i=0,STARPOINTS,1 do
-            pointA = {starVertices[math.fmod(i*2+1,STARPOINTS)],starVertices[math.fmod(i*2+2,STARPOINTS)]}
-            print(starVertices[math.fmod(i*2+1,STARPOINTS)],starVertices[math.fmod(i*2+2,STARPOINTS)])
-        end
-        love.graphics.polygon('fill',starVertices)--]]
     end
 
 
