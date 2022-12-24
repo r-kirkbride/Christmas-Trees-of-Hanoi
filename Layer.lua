@@ -27,8 +27,20 @@ function Layer:moveRight(dt)
     self.x = math.min(VIRTUAL_WIDTH, self.x + self.speed * dt)
 end
 
+function Layer:setXY(x,y)
+    self.x = x
+    self.y = y
+end
+
 function Layer:render()
-    --vertices = {self.x-self.width*0.25,self.y, self.x-self.width*0.5,self.y, self.x-self.width*0.375,self.y-self.height*0.5, self.x+self.width*0.375,self.y-self.height*0.5, self.x+self.width*0.5,self.y, self.x+self.width*0.25,self.y, self.x+self.width*0.375,self.y+self.height*0.5, self.x-self.width*0.375,self.y+self.height*0.5}
-    vertices = {self.x-self.width*0.5,self.y, self.x-self.width*0.5+35,self.y-self.height*0.5, self.x+self.width*0.5-35,self.y-self.height*0.5, self.x+self.width*0.5,self.y}
+    vertices = {}
+    vertices[1],vertices[2] = self.x-self.width-self.height,self.y -- bottom left
+    vertices[3],vertices[4] = self.x-self.width,self.y-self.height -- top left
+    vertices[5],vertices[6] = self.x+self.width,self.y-self.height -- top right
+    vertices[7],vertices[8] = self.x+self.width+self.height,self.y -- bottom right
+    love.graphics.setColor(0,1,0)
     love.graphics.polygon('fill', vertices)
+    --[[love.graphics.setColor(1,1,0)
+    love.graphics.circle('fill',vertices[1]+10,vertices[2]-5,15)
+    love.graphics.circle('fill',vertices[7]-10,vertices[8]-5,15)--]]
 end

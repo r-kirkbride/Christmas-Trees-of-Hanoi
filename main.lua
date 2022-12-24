@@ -9,10 +9,42 @@ WINDOW_HEIGHT = 720
 VIRTUAL_WIDTH = 1280
 VIRTUAL_HEIGHT = 720
 
+function move(moveLayer, TargetX, TargetY, dt)
+    if moveLayer then
+        if layers[moveLayer].y > 150 and math.abs(layers[moveLayer].x - targetX ) > 5 then
+            layers[moveLayer]:moveUp(dt)
+        elseif math.abs(layers[moveLayer].x - targetX ) <= 5 then
+            if layers[moveLayer].y < targetY then
+            layers[moveLayer]:moveDown(dt)
+            else
+                layers[moveLayer]:setXY(targetX,targetY)
+                score = score + 1
+                flag = true
+                for i=1,NUMDISCS,1 do
+                    if rod3[i] ~= i then
+                        flag = false
+                    end
+                end
+                if flag then
+                    GAME_STATE = "end"
+                else
+                    GAME_STATE = "play"
+                end
+            end
+        elseif layers[moveLayer].x < targetX then
+            layers[moveLayer]:moveRight(dt)
+        elseif layers[moveLayer].x > targetX then
+            layers[moveLayer]:moveLeft(dt)
+        end
+    end
+end
+
 function love.load()
     math.randomseed(os.time())
-    love.window.setTitle('Christmas Tree of Hanoi')
+    love.window.setTitle('Christmas Trees of Hanoi')
     love.graphics.setDefaultFilter('nearest', 'nearest')
+    icon = love.image.newImageData("icon.png")
+    love.window.setIcon(icon)
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
@@ -22,12 +54,16 @@ function love.load()
 
     love.keyboard.keysPressed = {}
     GAME_STATE = "start"
-    smallFont = love.graphics.newFont('font.ttf', 8)
-    largeFont = love.graphics.newFont('font.ttf', 16)
     scoreFont = love.graphics.newFont('font.ttf', 32)
     love.graphics.setFont(scoreFont)
 
-    numDiscs = 3
+    NUMDISCS = 5 -- number of branches
+    SPEED = 800 -- speed the branches move
+    DISCHEIGHT = 50 -- height of the branches
+    SPACING = 0 -- spacing between branches
+    STARRADIUS = 10
+    STARPOINTS = 5
+
     layers = {}
 
     rod1 = {}
@@ -36,18 +72,17 @@ function love.load()
 
     moveLayer = false
     
-    for i=0,numDiscs,1 do
-        layers[i] = Layer(200, 500-(numDiscs*30)+60*i, 75+50*i, 75, 400)
+    X = 200 -- starting x coord of branches
+    TREETOP = 650-(NUMDISCS*(DISCHEIGHT + SPACING)) -- y level of top branch of tree
+    for i=0,NUMDISCS,1 do
+        y = TREETOP+(DISCHEIGHT + SPACING)*i -- starting y coord of branch
+        width = 15*i -- width of top of layer
+        layers[i] = Layer(X, y, width, DISCHEIGHT, SPEED)
         rod1[i] = i
         rod2[i] = false
         rod3[i] = false
     end
 
-end
-
--- enables the console. Remove for release?
-function love.conf(t)
-	t.console = true
 end
 
 function love.update(dt)
@@ -72,7 +107,7 @@ function love.update(dt)
                     if v then
                         if layers[v].width > layers[moveLayer].width then
                             GAME_STATE = "move"
-                            targetY = 500-(numDiscs*30)+60*(i-1)
+                            targetY = TREETOP+(DISCHEIGHT + SPACING)*(i-1)
                             rod1[tempI] = false
                             rod2[i-1] = moveLayer
                         end
@@ -83,8 +118,8 @@ function love.update(dt)
                 if empty then
                     GAME_STATE = "move"
                     rod1[tempI] = false
-                    rod2[numDiscs] = moveLayer
-                    targetY = 500-(numDiscs*30)+60*numDiscs
+                    rod2[NUMDISCS] = moveLayer
+                    targetY = TREETOP+(DISCHEIGHT + SPACING)*NUMDISCS
                 end
             elseif love.keyboard.wasPressed("3") then
                 targetX = 1000
@@ -99,7 +134,7 @@ function love.update(dt)
                     if v then
                         if layers[v].width > layers[moveLayer].width then
                             GAME_STATE = "move"
-                            targetY = 500-(numDiscs*30)+60*(i-1)
+                            targetY = TREETOP+(DISCHEIGHT + SPACING)*(i-1)
                             rod1[tempI] = false
                             rod3[i-1] = moveLayer
                         end
@@ -110,8 +145,8 @@ function love.update(dt)
                 if empty then
                     GAME_STATE = "move"
                     rod1[tempI] = false
-                    rod3[numDiscs] = moveLayer
-                    targetY = 500-(numDiscs*30)+60*numDiscs
+                    rod3[NUMDISCS] = moveLayer
+                    targetY = TREETOP+(DISCHEIGHT + SPACING)*NUMDISCS
                 end
             end
         end
@@ -129,7 +164,7 @@ function love.update(dt)
                     if v then
                         if layers[v].width > layers[moveLayer].width then
                             GAME_STATE = "move"
-                            targetY = 500-(numDiscs*30)+60*(i-1)
+                            targetY = TREETOP+(DISCHEIGHT + SPACING)*(i-1)
                             rod2[tempI] = false
                             rod1[i-1] = moveLayer
                         end
@@ -140,8 +175,8 @@ function love.update(dt)
                 if empty then
                     GAME_STATE = "move"
                     rod2[tempI] = false
-                    rod1[numDiscs] = moveLayer
-                    targetY = 500-(numDiscs*30)+60*numDiscs
+                    rod1[NUMDISCS] = moveLayer
+                    targetY = TREETOP+(DISCHEIGHT + SPACING)*NUMDISCS
                 end
             elseif love.keyboard.wasPressed("3") then
                 targetX = 1000
@@ -156,7 +191,7 @@ function love.update(dt)
                     if v then
                         if layers[v].width > layers[moveLayer].width then
                             GAME_STATE = "move"
-                            targetY = 500-(numDiscs*30)+60*(i-1)
+                            targetY = TREETOP+(DISCHEIGHT + SPACING)*(i-1)
                             rod2[tempI] = false
                             rod3[i-1] = moveLayer
                         end
@@ -167,8 +202,8 @@ function love.update(dt)
                 if empty then
                     GAME_STATE = "move"
                     rod2[tempI] = false
-                    rod3[numDiscs] = moveLayer
-                    targetY = 500-(numDiscs*30)+60*numDiscs
+                    rod3[NUMDISCS] = moveLayer
+                    targetY = TREETOP+(DISCHEIGHT + SPACING)*NUMDISCS
                 end
             end
         end
@@ -186,7 +221,7 @@ function love.update(dt)
                     if v then
                         if layers[v].width > layers[moveLayer].width then
                             GAME_STATE = "move"
-                            targetY = 500-(numDiscs*30)+60*(i-1)
+                            targetY = TREETOP+(DISCHEIGHT + SPACING)*(i-1)
                             rod3[tempI] = false
                             rod2[i-1] = moveLayer
                         end
@@ -197,8 +232,8 @@ function love.update(dt)
                 if empty then
                     GAME_STATE = "move"
                     rod3[tempI] = false
-                    rod2[numDiscs] = moveLayer
-                    targetY = 500-(numDiscs*30)+60*numDiscs
+                    rod2[NUMDISCS] = moveLayer
+                    targetY = TREETOP+(DISCHEIGHT + SPACING)*NUMDISCS
                 end
             elseif love.keyboard.wasPressed("1") then
                 targetX = 200
@@ -213,7 +248,7 @@ function love.update(dt)
                     if v then
                         if layers[v].width > layers[moveLayer].width then
                             GAME_STATE = "move"
-                            targetY = 500-(numDiscs*30)+60*(i-1)
+                            targetY = TREETOP+(DISCHEIGHT + SPACING)*(i-1)
                             rod3[tempI] = false
                             rod1[i-1] = moveLayer
                         end
@@ -224,40 +259,16 @@ function love.update(dt)
                 if empty then
                     GAME_STATE = "move"
                     rod3[tempI] = false
-                    rod1[numDiscs] = moveLayer
-                    targetY = 500-(numDiscs*30)+60*numDiscs
+                    rod1[NUMDISCS] = moveLayer
+                    targetY = TREETOP+(DISCHEIGHT + SPACING)*NUMDISCS
                 end
             end
         end
     elseif GAME_STATE == "move" then
-        if moveLayer then
-            if layers[moveLayer].y > 150 and math.abs(layers[moveLayer].x - targetX ) > 1 then
-                layers[moveLayer]:moveUp(dt)
-            elseif math.abs(layers[moveLayer].x - targetX ) < 1 then
-                if layers[moveLayer].y < targetY then
-                layers[moveLayer]:moveDown(dt)
-                else
-                    score = score + 1
-                    flag = true
-                    for i=1,numDiscs,1 do
-                        if rod3[i] ~= i then
-                            flag = false
-                        end
-                    end
-                    if flag then
-                        GAME_STATE = "end"
-                    else
-                        GAME_STATE = "play"
-                    end
-                end
-            elseif layers[moveLayer].x < targetX then
-                layers[moveLayer]:moveRight(dt)
-            elseif layers[moveLayer].x > targetX then
-                layers[moveLayer]:moveLeft(dt)
-            end
-        end
+        move(moveLayer, TargetX, TargetY, dt)
     end
 
+    -- dictionary of keysPressed
     love.keyboard.keysPressed = {}
 end
 
@@ -280,6 +291,17 @@ function love.draw()
         love.graphics.printf(score, 0, 20, VIRTUAL_WIDTH, "center")
     elseif GAME_STATE == "end" then
         love.graphics.printf('You did it! Score: ' .. score, 0, 20, VIRTUAL_WIDTH, 'center')
+        --[[starVertices = {}
+        for i=0,STARPOINTS,1 do
+            pointAngle = ((math.pi * 2) / STARPOINTS) * i
+            starVertices[i*2+1],starVertices[i*2+2] = 1000+(STARRADIUS * math.sin(pointAngle)),TREETOP + (STARRADIUS * math.cos(pointAngle)) -- point
+        end
+        love.graphics.setColor(1,1,0)
+        for i=0,STARPOINTS,1 do
+            pointA = {starVertices[math.fmod(i*2+1,STARPOINTS)],starVertices[math.fmod(i*2+2,STARPOINTS)]}
+            print(starVertices[math.fmod(i*2+1,STARPOINTS)],starVertices[math.fmod(i*2+2,STARPOINTS)])
+        end
+        love.graphics.polygon('fill',starVertices)--]]
     end
 
 
